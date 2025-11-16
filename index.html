@@ -1,1 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One UI 8 Web Demo</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Home Screen -->
+    <div id="home-screen" class="screen active">
+        <div class="status-bar">
+            <div class="time">9:58 PM</div>
+            <div class="icons">📶 📡 🔋</div>
+        </div>
+        <div class="app-grid">
+            <div class="app-icon" data-app="camera">
+                <div class="icon">📷</div>
+                <span>Camera</span>
+            </div>
+            <div class="app-icon" data-app="gallery">
+                <div class="icon">🖼️</div>
+                <span>Gallery</span>
+            </div>
+            <div class="app-icon" data-app="music">
+                <div class="icon">🎵</div>
+                <span>Music</span>
+            </div>
+            <div class="app-icon" data-app="settings">
+                <div class="icon">⚙️</div>
+                <span>Settings</span>
+            </div>
+        </div>
+    </div>
 
+    <!-- App Screens (Hidden by default) -->
+    <div id="camera-app" class="screen app-screen">
+        <div class="app-header">
+            <button class="back-btn" data-close="camera">←</button>
+            <h1>Camera</h1>
+        </div>
+        <div class="app-content">
+            <p>Camera app content here. Tap ← to close with smooth animation.</p>
+            <!-- Add your camera UI here -->
+        </div>
+    </div>
+
+    <div id="gallery-app" class="screen app-screen">
+        <div class="app-header">
+            <button class="back-btn" data-close="gallery">←</button>
+            <h1>Gallery</h1>
+        </div>
+        <div class="app-content">
+            <p>Gallery app content here. Smooth open/close demo.</p>
+            <!-- Add images/grid here -->
+        </div>
+    </div>
+
+    <div id="music-app" class="screen app-screen">
+        <div class="app-header">
+            <button class="back-btn" data-close="music">←</button>
+            <h1>Music</h1>
+        </div>
+        <div class="app-content">
+            <p>Music player UI. Animations feel just like One UI 8!</p>
+            <!-- Add player controls here -->
+        </div>
+    </div>
+
+    <div id="settings-app" class="screen app-screen">
+        <div class="app-header">
+            <button class="back-btn" data-close="settings">←</button>
+            <h1>Settings</h1>
+        </div>
+        <div class="app-content">
+            <p>Settings menu with toggles. Back animates fluidly.</p>
+            <!-- Add list items here -->
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
