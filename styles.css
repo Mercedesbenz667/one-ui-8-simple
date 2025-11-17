@@ -1,28 +1,41 @@
-/* One UI 8 Core: Tunable, Fluid Animations */
+/* One UI 8 Theme: Vibrant, Rounded, Dark/Light */
 :root {
-    --anim-duration-open: 0.3s; /* Faster for One UI 8 */
-    --anim-duration-close: 0.25s;
-    --anim-easing-open: cubic-bezier(0.4, 0, 0.2, 1); /* Accel-decel from video */
-    --anim-easing-close: cubic-bezier(0.34, 1.56, 0.64, 1); /* Elastic bounce */
+    --primary-blue: #007AFF;
+    --accent-purple: #764ba2;
+    --bg-light: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    --bg-dark: linear-gradient(135deg, #121212 0%, #1e1e1e 100%);
+    --card-light: rgba(255, 255, 255, 0.8);
+    --card-dark: rgba(28, 28, 28, 0.8);
+    --text-light: #000;
+    --text-dark: #fff;
+    --anim-duration-open: 0.25s; /* One UI 8 quick */
+    --anim-duration-close: 0.2s;
+    --anim-easing-open: cubic-bezier(0.4, 0, 1, 1); /* Quick accel + overshoot */
+    --anim-easing-close: cubic-bezier(0.25, 0.46, 0.45, 1.2); /* Elastic snap */
     --anim-speed: 1;
-    --oneui8-mode: 1; /* 1 = enabled */
+    --oneui8-mode: 1;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
     font-family: 'Roboto', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: var(--bg-light);
     height: 100vh;
     overflow: hidden;
-    color: #000;
+    color: var(--text-light);
     touch-action: manipulation;
     -webkit-overflow-scrolling: touch;
+    transition: background 0.5s ease; /* Smooth theme switch */
+}
+
+body.dark-theme {
+    background: var(--bg-dark);
+    color: var(--text-dark);
 }
 
 .screen {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     opacity: 0; visibility: hidden;
     will-change: transform, opacity;
     transform: translateZ(0);
@@ -31,95 +44,131 @@ body {
 
 .screen.active { opacity: 1; visibility: visible; }
 
-/* Status Bar (Matches Screenshot Time/Icons) */
+/* Status Bar */
 .status-bar {
     display: flex; justify-content: space-between; align-items: center;
     padding: 0 16px; height: 44px;
-    background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
+    background: var(--card-light); backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     font-size: 14px; font-weight: 500;
+    color: var(--text-light);
 }
 
-.time { color: #000; }
-.icons { font-size: 16px; }
+body.dark-theme .status-bar { background: var(--card-dark); border-bottom-color: rgba(255, 255, 255, 0.1); color: var(--text-dark); }
 
-/* Weather Widget (Top, Like Your Pic) */
+/* Weather Widget */
 .weather-widget {
     display: flex; align-items: center; padding: 16px;
-    background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);
-    margin: 0 16px; border-radius: 20px; margin-bottom: 16px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    animation: fadeIn 0.5s ease-out; /* Subtle One UI entry */
+    background: var(--card-light); backdrop-filter: blur(10px);
+    margin: 0 16px; border-radius: 28px; margin-bottom: 16px; /* One UI 8 radius */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    animation: fadeInOvershoot 0.6s var(--anim-easing-open);
 }
+
+body.dark-theme .weather-widget { background: var(--card-dark); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); }
 
 .weather-icon { font-size: 48px; margin-right: 12px; }
 .weather-info .temp { font-size: 32px; font-weight: 700; }
 .weather-info .location { font-size: 14px; color: #666; }
 .weather-info .details { font-size: 12px; color: #999; }
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+body.dark-theme .weather-info .location { color: #ccc; }
+body.dark-theme .weather-info .details { color: #888; }
 
-/* App Grid (4xN, Scrollable) */
+/* App Grid */
 .app-grid {
     display: grid; grid-template-columns: repeat(4, 1fr);
-    gap: 20px; padding: 0 12px 80px; /* Space for bottom bar */
+    gap: 20px; padding: 0 12px 80px;
     height: calc(100% - 120px); overflow-y: auto;
 }
 
 .app-icon {
     display: flex; flex-direction: column; align-items: center;
-    padding: 12px; border-radius: 28px;
-    background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px);
-    cursor: pointer; transition: all 0.2s var(--anim-easing-open);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); touch-action: manipulation;
+    padding: 16px; border-radius: 28px; /* One UI 8 */
+    background: var(--card-light); backdrop-filter: blur(10px);
+    cursor: pointer; transition: all 0.15s var(--anim-easing-open);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); touch-action: manipulation;
 }
 
-.app-icon:active { transform: scale(0.95); box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15); }
-.app-icon:hover:not(:active) { transform: scale(1.05); background: rgba(255, 255, 255, 1); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); }
+body.dark-theme .app-icon { background: var(--card-dark); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); }
 
-.icon { font-size: 48px; margin-bottom: 8px; }
+.app-icon:active { transform: scale(0.92) rotate(1deg); /* Subtle tilt for One UI feel */ }
+.app-icon:hover:not(:active) { transform: scale(1.08); background: var(--primary-blue); color: #fff; }
+
+.icon { font-size: 48px; margin-bottom: 8px; transition: transform 0.2s ease; }
+.app-icon:hover .icon { transform: rotate(360deg); /* Fun spin */ }
+
 .app-icon span { font-size: 12px; font-weight: 500; text-align: center; }
 
-/* Google Search Bar (Bottom) */
+/* Google Bar */
 .google-bar {
     position: fixed; bottom: 0; left: 0; right: 0;
-    background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);
+    background: var(--card-light); backdrop-filter: blur(10px);
     padding: 12px 16px; border-top: 1px solid rgba(0, 0, 0, 0.1);
     display: flex; align-items: center;
 }
 
-.search-input { flex: 1; padding: 12px; border: none; border-radius: 24px; background: #f0f0f0; font-size: 16px; }
+body.dark-theme .google-bar { background: var(--card-dark); border-top-color: rgba(255, 255, 255, 0.1); }
+
+.search-input { flex: 1; padding: 12px; border: none; border-radius: 28px; background: #f0f0f0; font-size: 16px; }
+body.dark-theme .search-input { background: #333; color: #fff; }
 .search-mic { font-size: 20px; margin-left: 12px; cursor: pointer; }
 
 /* App Screens */
-.app-screen { background: #fff; border-radius: 28px 28px 0 0; padding: 20px; overflow-y: auto; }
+.app-screen { 
+    background: var(--card-light); border-radius: 28px 28px 0 0; 
+    padding: 20px; overflow-y: auto; 
+}
+
+body.dark-theme .app-screen { background: var(--card-dark); }
 
 .app-header { display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid rgba(0, 0, 0, 0.1); }
+body.dark-theme .app-header { border-bottom-color: rgba(255, 255, 255, 0.1); }
+
 .app-header h1 { flex: 1; font-size: 24px; font-weight: 500; margin-left: 12px; }
 
-.back-btn { background: none; border: none; font-size: 24px; cursor: pointer; padding: 8px; border-radius: 50%; transition: background 0.2s ease; }
-.back-btn:hover { background: rgba(0, 122, 255, 0.1); }
+.back-btn { background: none; border: none; font-size: 24px; cursor: pointer; padding: 8px; border-radius: 50%; transition: all 0.2s ease; }
+.back-btn:hover { background: var(--primary-blue); color: #fff; transform: scale(1.1); }
 
 .app-content { font-size: 16px; line-height: 1.5; -webkit-overflow-scrolling: touch; }
 
-/* Tuning UI */
-.tuning-section { margin-bottom: 20px; }
-.tuning-section h2 { font-size: 18px; margin-bottom: 8px; }
-.tuning-section select { width: 100%; padding: 12px; border: 1px solid rgba(0, 0, 0, 0.1); border-radius: 8px; font-size: 16px; background: #f8f9fa; }
+/* Wallpaper Grid in Gallery */
+.wallpaper-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px;
+}
 
-.toggle { position: relative; display: inline-block; width: 50px; height: 24px; }
+.wallpaper-option {
+    height: 200px; border-radius: 28px; cursor: pointer;
+    transition: all 0.3s var(--anim-easing-open); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    animation: wallpaperPulse 2s infinite alternate;
+}
+
+.wallpaper-option:hover { transform: scale(1.05); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3); }
+
+@keyframes wallpaperPulse { 0% { opacity: 0.8; } 100% { opacity: 1; } }
+
+/* Tuning UI */
+.tuning-section { margin-bottom: 24px; }
+.tuning-section h2 { font-size: 18px; margin-bottom: 12px; color: var(--primary-blue); }
+.tuning-section select { width: 100%; padding: 12px; border: 1px solid var(--primary-blue); border-radius: 12px; font-size: 16px; background: var(--card-light); }
+
+body.dark-theme .tuning-section select { background: var(--card-dark); color: var(--text-dark); }
+
+.toggle { position: relative; display: inline-block; width: 50px; height: 24px; margin-right: 10px; }
 .toggle input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #ccc; border-radius: 24px; transition: 0.3s; }
+.slider { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: #ccc; border-radius: 24px; transition: 0.3s; cursor: pointer; }
 .slider:before { content: ""; position: absolute; height: 18px; width: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.3s; }
-input:checked + .slider { background: #007AFF; }
+input:checked + .slider { background: var(--primary-blue); }
 input:checked + .slider:before { transform: translateX(26px); }
 
-#quick-demo { padding: 12px 24px; background: #007AFF; color: #fff; border: none; border-radius: 24px; cursor: pointer; margin-top: 10px; }
+#quick-demo { padding: 12px 24px; background: var(--primary-blue); color: #fff; border: none; border-radius: 28px; cursor: pointer; margin-top: 10px; transition: transform 0.2s ease; }
+#quick-demo:hover { transform: scale(1.05); }
 
-/* One UI 8 Animations (From TikTok) */
+/* New One UI 8 Animations: Overshoot + Stagger */
 @keyframes openApp {
-    from { opacity: 0; transform: scale(0.8) translateY(40px) translateZ(0); }
-    to { opacity: 1; transform: scale(1) translateY(0) translateZ(0); }
+    0% { opacity: 0; transform: scale(0.85) translateY(60px) translateZ(0) rotate(-5deg); }
+    50% { transform: scale(1.05) translateY(-10px) translateZ(0) rotate(2deg); } /* Overshoot */
+    100% { opacity: 1; transform: scale(1) translateY(0) translateZ(0) rotate(0); }
 }
 
 .app-screen.active {
@@ -127,37 +176,30 @@ input:checked + .slider:before { transform: translateX(26px); }
 }
 
 @keyframes closeApp {
-    from { opacity: 1; transform: scale(1) translateY(0) translateZ(0); }
-    to { opacity: 0; transform: scale(0.9) translateY(5px) translateZ(0); } /* Micro-bounce */
+    0% { opacity: 1; transform: scale(1) translateY(0) translateZ(0); }
+    100% { opacity: 0; transform: scale(0.88) translateY(20px) translateZ(0) rotate(5deg); } /* Snap-back */
 }
 
 .app-screen.closing {
     animation: closeApp calc(var(--anim-duration-close) / var(--anim-speed)) var(--anim-easing-close);
 }
 
-/* Quick Switch Mode (Reduced lag for rapid opens) */
-body.oneui8-quick .screen { transition-duration: 0.15s !important; } /* Video's "instant" feel */
-
-/* Full Device Resolutions (Your Galaxy + All) */
-@media (max-width: 414px) { /* Galaxy S/Plus */
-    .app-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 0 8px 80px; }
-    .icon { font-size: 42px; }
-    .weather-widget { margin: 0 12px; padding: 12px; }
+/* Staggered Icon Return (On Home Back) */
+@keyframes iconStagger {
+    0% { transform: translateY(20px) scale(0.9); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
 }
 
-@media (max-width: 393px) { /* iPhone 15 equiv. */
-    .app-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; }
-    .status-bar { height: 40px; padding: 0 12px; }
-}
+.home-return .app-icon:nth-child(1) { animation: iconStagger 0.4s ease; }
+.home-return .app-icon:nth-child(2) { animation: iconStagger 0.45s ease; }
+.home-return .app-icon:nth-child(3) { animation: iconStagger 0.5s ease; }
+/* Add more for additional icons */
 
+body.oneui8-quick .screen { transition-duration: 0.12s !important; } /* Ultra-quick for mode */
+
+/* Resolutions (All Phones + Your Galaxy) */
+@media (max-width: 414px) { .app-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 0 8px 80px; } .icon { font-size: 42px; } .weather-widget { margin: 0 12px; padding: 12px; } }
+@media (max-width: 393px) { .app-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; } .status-bar { height: 40px; padding: 0 12px; } }
 @media (max-width: 360px) { .app-grid { grid-template-columns: repeat(2, 1fr); } }
-
-@media (min-width: 600px) and (max-width: 800px) { /* Foldables */
-    .app-grid { grid-template-columns: repeat(5, 1fr); gap: 18px; }
-}
-
-@media (orientation: landscape) and (max-height: 500px) {
-    .app-grid { grid-template-columns: repeat(6, 1fr); gap: 12px; padding: 0 8px 60px; }
-    .status-bar { height: 32px; font-size: 12px; }
-    .google-bar { padding: 8px 12px; }
-}
+@media (min-width: 600px) and (max-width: 800px) { .app-grid { grid-template-columns: repeat(5, 1fr); gap: 18px; } }
+@media (orientation: landscape) and (max-height: 500px) { .app-grid { grid-template-columns: repeat(6, 1fr); gap: 12px; padding: 0 8px 60px; } .status-bar { height: 32px; font-size: 12px; } .google-bar { padding: 8px 12px; } }
