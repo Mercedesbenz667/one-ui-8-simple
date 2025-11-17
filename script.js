@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 targetApp.classList.remove('active', 'closing');
                 homeScreen.classList.add('active');
-            }, 300); // Match close animation duration
+            }, 350); // Match close animation duration (0.35s)
         });
     });
 
@@ -40,12 +40,28 @@ document.addEventListener('DOMContentLoaded', () => {
         screen.addEventListener('transitionstart', () => {
             if (screen.classList.contains('active')) {
                 document.body.style.overflow = 'hidden';
+                document.body.style.position = 'fixed'; // iOS anti-bounce
+                document.body.style.width = '100%';
             }
         });
         screen.addEventListener('transitionend', () => {
             if (!screen.classList.contains('active')) {
                 document.body.style.overflow = 'auto';
+                document.body.style.position = 'static';
+                document.body.style.width = 'auto';
             }
         });
     });
+
+    // Phone Enhancements: Landscape Detection & Scroll Lock
+    function handleOrientation() {
+        if (window.innerWidth > window.innerHeight) {
+            document.body.classList.add('landscape');
+        } else {
+            document.body.classList.remove('landscape');
+        }
+    }
+
+    window.addEventListener('resize', handleOrientation);
+    handleOrientation(); // Initial check
 });
