@@ -34,15 +34,14 @@
         </div>
     </div>
 
-    <!-- App Screens (Hidden by default) -->
+    <!-- App Screens -->
     <div id="camera-app" class="screen app-screen">
         <div class="app-header">
             <button class="back-btn" data-close="camera">←</button>
             <h1>Camera</h1>
         </div>
         <div class="app-content">
-            <p>Camera app content here. Tap ← to close with smooth animation.</p>
-            <!-- Add your camera UI here -->
+            <p>Camera app with tuned animations!</p>
         </div>
     </div>
 
@@ -52,8 +51,7 @@
             <h1>Gallery</h1>
         </div>
         <div class="app-content">
-            <p>Gallery app content here. Smooth open/close demo.</p>
-            <!-- Add images/grid here -->
+            <p>Gallery with fluid One UI 8 transitions.</p>
         </div>
     </div>
 
@@ -63,19 +61,33 @@
             <h1>Music</h1>
         </div>
         <div class="app-content">
-            <p>Music player UI. Animations feel just like One UI 8!</p>
-            <!-- Add player controls here -->
+            <p>Music player—feel the smoothness!</p>
         </div>
     </div>
 
     <div id="settings-app" class="screen app-screen">
         <div class="app-header">
             <button class="back-btn" data-close="settings">←</button>
-            <h1>Settings</h1>
+            <h1>Animation Tuning</h1>
         </div>
         <div class="app-content">
-            <p>Settings menu with toggles. Back animates fluidly.</p>
-            <!-- Add list items here -->
+            <div class="tuning-section">
+                <h2>Motion Smoothness</h2>
+                <select id="anim-speed">
+                    <option value="0.5">0.5x (Ultra Smooth)</option>
+                    <option value="1" selected>1x (Standard)</option>
+                    <option value="1.5">1.5x (Fast)</option>
+                </select>
+            </div>
+            <div class="tuning-section">
+                <h2>Easing Style</h2>
+                <select id="anim-easing">
+                    <option value="standard">Standard (One UI 7)</option>
+                    <option value="elastic" selected>Elastic (One UI 8)</option>
+                    <option value="custom">Custom Bounce</option>
+                </select>
+            </div>
+            <p>Changes apply instantly. Reload for persistence.</p>
         </div>
     </div>
 
