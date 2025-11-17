@@ -1,4 +1,4 @@
-/* One UI 8 Theme: Vibrant, Rounded, Dark/Light */
+/* One UI 8: Lag-Free, 120Hz-Optimized */
 :root {
     --primary-blue: #007AFF;
     --accent-purple: #764ba2;
@@ -8,12 +8,13 @@
     --card-dark: rgba(28, 28, 28, 0.8);
     --text-light: #000;
     --text-dark: #fff;
-    --anim-duration-open: 0.25s; /* One UI 8 quick */
+    --anim-duration-open: 0.25s;
     --anim-duration-close: 0.2s;
-    --anim-easing-open: cubic-bezier(0.4, 0, 1, 1); /* Quick accel + overshoot */
-    --anim-easing-close: cubic-bezier(0.25, 0.46, 0.45, 1.2); /* Elastic snap */
+    --anim-easing-open: cubic-bezier(0.4, 0, 1, 1);
+    --anim-easing-close: cubic-bezier(0.25, 0.46, 0.45, 1.2);
     --anim-speed: 1;
     --oneui8-mode: 1;
+    --swipe-threshold: 50px; /* For gesture detection */
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -24,9 +25,10 @@ body {
     height: 100vh;
     overflow: hidden;
     color: var(--text-light);
-    touch-action: manipulation;
+    touch-action: pan-y pan-x; /* Allow swipes, prevent zoom */
     -webkit-overflow-scrolling: touch;
-    transition: background 0.5s ease; /* Smooth theme switch */
+    transition: background 0.5s ease;
+    will-change: background; /* Pre-optimize for theme swaps */
 }
 
 body.dark-theme {
@@ -34,12 +36,18 @@ body.dark-theme {
     color: var(--text-dark);
 }
 
+/* Reduced Motion Support (For Accessibility/High Hz) */
+@media (prefers-reduced-motion: reduce) {
+    * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+
 .screen {
     position: absolute; top: 0; left: 0; width: 100%; height: 100%;
     opacity: 0; visibility: hidden;
     will-change: transform, opacity;
-    transform: translateZ(0);
+    transform: translate3d(0, 0, 0); /* 3D for 120Hz smoothness */
     transition: all calc(var(--anim-duration-open) / var(--anim-speed)) var(--anim-easing-open);
+    backface-visibility: hidden; /* Anti-flicker on high Hz */
 }
 
 .screen.active { opacity: 1; visibility: visible; }
@@ -52,6 +60,7 @@ body.dark-theme {
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     font-size: 14px; font-weight: 500;
     color: var(--text-light);
+    will-change: opacity; /* Optimize for swipe overlays */
 }
 
 body.dark-theme .status-bar { background: var(--card-dark); border-bottom-color: rgba(255, 255, 255, 0.1); color: var(--text-dark); }
@@ -60,9 +69,10 @@ body.dark-theme .status-bar { background: var(--card-dark); border-bottom-color:
 .weather-widget {
     display: flex; align-items: center; padding: 16px;
     background: var(--card-light); backdrop-filter: blur(10px);
-    margin: 0 16px; border-radius: 28px; margin-bottom: 16px; /* One UI 8 radius */
+    margin: 0 16px; border-radius: 28px; margin-bottom: 16px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     animation: fadeInOvershoot 0.6s var(--anim-easing-open);
+    transform: translateZ(0); /* Layer for smoothness */
 }
 
 body.dark-theme .weather-widget { background: var(--card-dark); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); }
@@ -75,28 +85,32 @@ body.dark-theme .weather-widget { background: var(--card-dark); box-shadow: 0 8p
 body.dark-theme .weather-info .location { color: #ccc; }
 body.dark-theme .weather-info .details { color: #888; }
 
+@keyframes fadeInOvershoot { 0% { opacity: 0; transform: translateY(-10px) translateZ(0); } 50% { transform: translateY(5px) translateZ(0); } 100% { opacity: 1; transform: translateY(0) translateZ(0); } }
+
 /* App Grid */
 .app-grid {
     display: grid; grid-template-columns: repeat(4, 1fr);
     gap: 20px; padding: 0 12px 80px;
     height: calc(100% - 120px); overflow-y: auto;
+    transform: translateZ(0);
 }
 
 .app-icon {
     display: flex; flex-direction: column; align-items: center;
-    padding: 16px; border-radius: 28px; /* One UI 8 */
+    padding: 16px; border-radius: 28px;
     background: var(--card-light); backdrop-filter: blur(10px);
     cursor: pointer; transition: all 0.15s var(--anim-easing-open);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12); touch-action: manipulation;
+    will-change: transform; /* Pre-optimize hovers */
 }
 
 body.dark-theme .app-icon { background: var(--card-dark); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); }
 
-.app-icon:active { transform: scale(0.92) rotate(1deg); /* Subtle tilt for One UI feel */ }
-.app-icon:hover:not(:active) { transform: scale(1.08); background: var(--primary-blue); color: #fff; }
+.app-icon:active { transform: scale(0.92) rotate(1deg) translateZ(0); }
+.app-icon:hover:not(:active) { transform: scale(1.08) translateZ(0); background: var(--primary-blue); color: #fff; }
 
-.icon { font-size: 48px; margin-bottom: 8px; transition: transform 0.2s ease; }
-.app-icon:hover .icon { transform: rotate(360deg); /* Fun spin */ }
+.icon { font-size: 48px; margin-bottom: 8px; transition: transform 0.2s ease; will-change: transform; }
+.app-icon:hover .icon { transform: rotate(360deg); }
 
 .app-icon span { font-size: 12px; font-weight: 500; text-align: center; }
 
@@ -106,6 +120,7 @@ body.dark-theme .app-icon { background: var(--card-dark); box-shadow: 0 8px 24px
     background: var(--card-light); backdrop-filter: blur(10px);
     padding: 12px 16px; border-top: 1px solid rgba(0, 0, 0, 0.1);
     display: flex; align-items: center;
+    will-change: transform; /* For swipe feedback */
 }
 
 body.dark-theme .google-bar { background: var(--card-dark); border-top-color: rgba(255, 255, 255, 0.1); }
@@ -118,6 +133,7 @@ body.dark-theme .search-input { background: #333; color: #fff; }
 .app-screen { 
     background: var(--card-light); border-radius: 28px 28px 0 0; 
     padding: 20px; overflow-y: auto; 
+    touch-action: pan-y pinch-zoom; /* Allow vertical scroll + pinch */
 }
 
 body.dark-theme .app-screen { background: var(--card-dark); }
@@ -130,20 +146,22 @@ body.dark-theme .app-header { border-bottom-color: rgba(255, 255, 255, 0.1); }
 .back-btn { background: none; border: none; font-size: 24px; cursor: pointer; padding: 8px; border-radius: 50%; transition: all 0.2s ease; }
 .back-btn:hover { background: var(--primary-blue); color: #fff; transform: scale(1.1); }
 
-.app-content { font-size: 16px; line-height: 1.5; -webkit-overflow-scrolling: touch; }
+/* Swipe Feedback (Visual During Gesture) */
+.swiping .screen { transition: none !important; } /* Disable transitions during swipe */
+.swiping .app-screen { transform: translateX(var(--swipe-delta, 0)) !important; }
+.swiping-down .app-screen { transform: translateY(var(--swipe-delta-y, 0)) !important; opacity: var(--swipe-opacity, 1); }
 
-/* Wallpaper Grid in Gallery */
-.wallpaper-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px;
-}
+/* Wallpaper Grid */
+.wallpaper-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 20px; }
 
 .wallpaper-option {
     height: 200px; border-radius: 28px; cursor: pointer;
     transition: all 0.3s var(--anim-easing-open); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     animation: wallpaperPulse 2s infinite alternate;
+    transform: translateZ(0);
 }
 
-.wallpaper-option:hover { transform: scale(1.05); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3); }
+.wallpaper-option:hover { transform: scale(1.05) translateZ(0); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3); }
 
 @keyframes wallpaperPulse { 0% { opacity: 0.8; } 100% { opacity: 1; } }
 
@@ -164,10 +182,10 @@ input:checked + .slider:before { transform: translateX(26px); }
 #quick-demo { padding: 12px 24px; background: var(--primary-blue); color: #fff; border: none; border-radius: 28px; cursor: pointer; margin-top: 10px; transition: transform 0.2s ease; }
 #quick-demo:hover { transform: scale(1.05); }
 
-/* New One UI 8 Animations: Overshoot + Stagger */
+/* Animations (120Hz-Scaled) */
 @keyframes openApp {
     0% { opacity: 0; transform: scale(0.85) translateY(60px) translateZ(0) rotate(-5deg); }
-    50% { transform: scale(1.05) translateY(-10px) translateZ(0) rotate(2deg); } /* Overshoot */
+    50% { transform: scale(1.05) translateY(-10px) translateZ(0) rotate(2deg); }
     100% { opacity: 1; transform: scale(1) translateY(0) translateZ(0) rotate(0); }
 }
 
@@ -177,27 +195,28 @@ input:checked + .slider:before { transform: translateX(26px); }
 
 @keyframes closeApp {
     0% { opacity: 1; transform: scale(1) translateY(0) translateZ(0); }
-    100% { opacity: 0; transform: scale(0.88) translateY(20px) translateZ(0) rotate(5deg); } /* Snap-back */
+    100% { opacity: 0; transform: scale(0.88) translateY(20px) translateZ(0) rotate(5deg); }
 }
 
 .app-screen.closing {
     animation: closeApp calc(var(--anim-duration-close) / var(--anim-speed)) var(--anim-easing-close);
 }
 
-/* Staggered Icon Return (On Home Back) */
 @keyframes iconStagger {
-    0% { transform: translateY(20px) scale(0.9); opacity: 0; }
-    100% { transform: translateY(0) scale(1); opacity: 1; }
+    0% { transform: translateY(20px) scale(0.9) translateZ(0); opacity: 0; }
+    100% { transform: translateY(0) scale(1) translateZ(0); opacity: 1; }
 }
 
-.home-return .app-icon:nth-child(1) { animation: iconStagger 0.4s ease; }
-.home-return .app-icon:nth-child(2) { animation: iconStagger 0.45s ease; }
-.home-return .app-icon:nth-child(3) { animation: iconStagger 0.5s ease; }
-/* Add more for additional icons */
+.home-return .app-icon:nth-child(1) { animation: iconStagger 0.4s ease forwards; }
+.home-return .app-icon:nth-child(2) { animation: iconStagger 0.45s ease forwards; }
+.home-return .app-icon:nth-child(3) { animation: iconStagger 0.5s ease forwards; }
+.home-return .app-icon:nth-child(4) { animation: iconStagger 0.55s ease forwards; }
+.home-return .app-icon:nth-child(5) { animation: iconStagger 0.6s ease forwards; }
+.home-return .app-icon:nth-child(6) { animation: iconStagger 0.65s ease forwards; }
 
-body.oneui8-quick .screen { transition-duration: 0.12s !important; } /* Ultra-quick for mode */
+body.oneui8-quick .screen { transition-duration: 0.12s !important; }
 
-/* Resolutions (All Phones + Your Galaxy) */
+/* Resolutions */
 @media (max-width: 414px) { .app-grid { grid-template-columns: repeat(4, 1fr); gap: 16px; padding: 0 8px 80px; } .icon { font-size: 42px; } .weather-widget { margin: 0 12px; padding: 12px; } }
 @media (max-width: 393px) { .app-grid { grid-template-columns: repeat(3, 1fr); gap: 14px; } .status-bar { height: 40px; padding: 0 12px; } }
 @media (max-width: 360px) { .app-grid { grid-template-columns: repeat(2, 1fr); } }
