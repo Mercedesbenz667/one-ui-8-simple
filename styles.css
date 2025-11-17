@@ -1,18 +1,15 @@
-/* One UI 8 Core Styles: Rounded, clean, mobile-first */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
+/* Add to body: Touch-friendly */
 body {
     font-family: 'Roboto', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Subtle One UI gradient */
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     height: 100vh;
     overflow: hidden;
     color: #000;
+    touch-action: manipulation; /* Faster touch response on phones */
+    -webkit-overflow-scrolling: touch; /* iOS smooth scroll */
 }
 
+/* Enhanced Screen Transitions: Hardware accel + better easing */
 .screen {
     position: absolute;
     top: 0;
@@ -21,7 +18,9 @@ body {
     height: 100%;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94); /* Smooth One UI easing */
+    will-change: transform, opacity; /* GPU acceleration for smoothness */
+    transform: translateZ(0); /* Force hardware layers */
+    transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1); /* Refined One UI ease-out */
 }
 
 .screen.active {
@@ -29,30 +28,14 @@ body {
     visibility: visible;
 }
 
-/* Status Bar */
-.status-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 16px;
-    height: 44px;
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px); /* Frosted glass effect */
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.time { color: #000; }
-.icons { font-size: 16px; }
-
-/* Home Screen Grid */
+/* App Grid: Better phone fit (3-col on tiny screens) */
 .app-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
-    padding: 60px 16px 32px;
+    gap: 20px; /* Slightly smaller gap for phones */
+    padding: 60px 12px 24px; /* Tighter padding */
     height: calc(100% - 44px);
+    overflow-y: auto; /* Scroll if too many apps */
 }
 
 .app-icon {
@@ -60,110 +43,88 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 12px;
-    border-radius: 28px; /* One UI rounded corners */
+    border-radius: 28px;
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bouncy on hover/press */
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    touch-action: manipulation; /* Prevent double-tap zoom */
 }
 
-.app-icon:hover {
+.app-icon:active { /* Press feedback for touch */
+    transform: scale(0.95) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.app-icon:hover:not(:active) { /* Hover for desktop */
     transform: scale(1.05);
     background: rgba(255, 255, 255, 1);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
-.icon {
-    font-size: 48px;
-    margin-bottom: 8px;
-}
-
-.app-icon span {
-    font-size: 12px;
-    font-weight: 500;
-    text-align: center;
-}
-
-/* App Screens */
-.app-screen {
-    background: #fff;
-    border-radius: 28px 28px 0 0; /* Rounded top for immersion */
-    padding: 20px;
-    overflow-y: auto;
-}
-
-.app-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.app-header h1 {
-    flex: 1;
-    font-size: 24px;
-    font-weight: 500;
-    margin-left: 12px;
-}
-
-.back-btn {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    padding: 8px;
-    border-radius: 50%;
-    transition: background 0.2s ease;
-}
-
-.back-btn:hover {
-    background: rgba(0, 122, 255, 0.1); /* Primary blue tint */
-}
-
-.app-content {
-    font-size: 16px;
-    line-height: 1.5;
-}
-
-/* Open Animation: Scale from icon + slide up */
+/* Refined Open Animation: More fluid scale + fade */
 @keyframes openApp {
     from {
         opacity: 0;
-        transform: scale(0.8) translateY(100px);
+        transform: scale(0.7) translateY(50px) translateZ(0);
     }
     to {
         opacity: 1;
-        transform: scale(1) translateY(0);
+        transform: scale(1) translateY(0) translateZ(0);
     }
 }
 
 .app-screen.active {
-    animation: openApp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: openApp 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); /* Elastic bounce */
 }
 
-/* Close Animation: Reverse scale + slide down with bounce */
+/* Enhanced Close: Subtle overshoot for "snap" */
 @keyframes closeApp {
     from {
         opacity: 1;
-        transform: scale(1) translateY(0);
+        transform: scale(1) translateY(0) translateZ(0);
     }
     to {
         opacity: 0;
-        transform: scale(0.9) translateY(20px);
+        transform: scale(0.92) translateY(10px) translateZ(0);
     }
 }
 
 .app-screen.closing {
-    animation: closeApp 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bounce easing */
+    animation: closeApp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Responsive for mobile */
-@media (max-width: 480px) {
+/* Phone Resolutions: Responsive Grid & Status Bar */
+@media (max-width: 480px) { /* Small phones (e.g., iPhone SE) */
     .app-grid {
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr); /* 3 cols for tiny screens */
         gap: 16px;
         padding: 50px 8px 16px;
     }
+    .status-bar {
+        padding: 0 12px;
+        height: 40px; /* Shorter on small phones */
+    }
+    .icon { font-size: 40px; } /* Smaller icons */
+}
+
+@media (max-width: 360px) { /* Ultra-small (old phones) */
+    .app-grid { grid-template-columns: repeat(2, 1fr); } /* 2 cols */
+}
+
+@media (orientation: landscape) { /* Landscape mode */
+    .app-grid {
+        grid-template-columns: repeat(5, 1fr); /* More cols sideways */
+        gap: 12px;
+        padding: 40px 8px 16px;
+    }
+    .status-bar { height: 30px; font-size: 12px; }
+}
+
+/* App Content: Better scroll on phones */
+.app-content {
+    font-size: 16px;
+    line-height: 1.5;
+    -webkit-overflow-scrolling: touch;
 }
