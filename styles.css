@@ -1,4 +1,12 @@
 /* One UI 8 Core Styles: Rounded, clean, mobile-first */
+:root {
+    --anim-duration-open: 0.4s;
+    --anim-duration-close: 0.3s;
+    --anim-easing-open: cubic-bezier(0.4, 0, 0.2, 1); /* One UI accelerate-decel */
+    --anim-easing-close: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    --anim-speed: 1;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -7,12 +15,12 @@
 
 body {
     font-family: 'Roboto', sans-serif;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); /* Subtle One UI gradient */
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     height: 100vh;
     overflow: hidden;
     color: #000;
-    touch-action: manipulation; /* Faster touch response on phones */
-    -webkit-overflow-scrolling: touch; /* iOS smooth scroll */
+    touch-action: manipulation;
+    -webkit-overflow-scrolling: touch;
 }
 
 .screen {
@@ -23,9 +31,9 @@ body {
     height: 100%;
     opacity: 0;
     visibility: hidden;
-    will-change: transform, opacity; /* GPU acceleration for smoothness */
-    transform: translateZ(0); /* Force hardware layers */
-    transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1); /* Refined One UI ease-out */
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    transition: all var(--anim-duration-open) var(--anim-easing-open);
 }
 
 .screen.active {
@@ -41,7 +49,7 @@ body {
     padding: 0 16px;
     height: 44px;
     background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px); /* Frosted glass effect */
+    backdrop-filter: blur(10px);
     border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     font-size: 14px;
     font-weight: 500;
@@ -54,10 +62,10 @@ body {
 .app-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 20px; /* Slightly smaller gap for phones */
-    padding: 60px 12px 24px; /* Tighter padding */
+    gap: 20px;
+    padding: 60px 12px 24px;
     height: calc(100% - 44px);
-    overflow-y: auto; /* Scroll if too many apps */
+    overflow-y: auto;
 }
 
 .app-icon {
@@ -65,21 +73,21 @@ body {
     flex-direction: column;
     align-items: center;
     padding: 12px;
-    border-radius: 28px; /* One UI rounded corners */
+    border-radius: 28px;
     background: rgba(255, 255, 255, 0.8);
     backdrop-filter: blur(10px);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bouncy on hover/press */
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    touch-action: manipulation; /* Prevent double-tap zoom */
+    touch-action: manipulation;
 }
 
-.app-icon:active { /* Press feedback for touch */
+.app-icon:active {
     transform: scale(0.95) !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.app-icon:hover:not(:active) { /* Hover for desktop */
+.app-icon:hover:not(:active) {
     transform: scale(1.05);
     background: rgba(255, 255, 255, 1);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
@@ -99,7 +107,7 @@ body {
 /* App Screens */
 .app-screen {
     background: #fff;
-    border-radius: 28px 28px 0 0; /* Rounded top for immersion */
+    border-radius: 28px 28px 0 0;
     padding: 20px;
     overflow-y: auto;
 }
@@ -130,7 +138,7 @@ body {
 }
 
 .back-btn:hover {
-    background: rgba(0, 122, 255, 0.1); /* Primary blue tint */
+    background: rgba(0, 122, 255, 0.1);
 }
 
 .app-content {
@@ -139,7 +147,26 @@ body {
     -webkit-overflow-scrolling: touch;
 }
 
-/* Refined Open Animation: More fluid scale + fade */
+/* Tuning UI */
+.tuning-section {
+    margin-bottom: 20px;
+}
+
+.tuning-section h2 {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+.tuning-section select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    font-size: 16px;
+    background: #f8f9fa;
+}
+
+/* Animations (Tunable via CSS vars) */
 @keyframes openApp {
     from {
         opacity: 0;
@@ -152,10 +179,9 @@ body {
 }
 
 .app-screen.active {
-    animation: openApp 0.45s cubic-bezier(0.34, 1.56, 0.64, 1); /* Elastic bounce */
+    animation: openApp calc(var(--anim-duration-open) / var(--anim-speed)) var(--anim-easing-open);
 }
 
-/* Enhanced Close: Subtle overshoot for "snap" */
 @keyframes closeApp {
     from {
         opacity: 1;
@@ -168,32 +194,41 @@ body {
 }
 
 .app-screen.closing {
-    animation: closeApp 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    animation: closeApp calc(var(--anim-duration-close) / var(--anim-speed)) var(--anim-easing-close);
 }
 
-/* Phone Resolutions: Responsive Grid & Status Bar */
-@media (max-width: 480px) { /* Small phones (e.g., iPhone SE) */
+/* Comprehensive Phone Resolutions */
+@media (max-width: 414px) { /* iPhone Plus/older flagships */
     .app-grid {
-        grid-template-columns: repeat(3, 1fr); /* 3 cols for tiny screens */
+        grid-template-columns: repeat(3, 1fr);
         gap: 16px;
         padding: 50px 8px 16px;
     }
-    .status-bar {
-        padding: 0 12px;
-        height: 40px; /* Shorter on small phones */
-    }
-    .icon { font-size: 40px; } /* Smaller icons */
+    .icon { font-size: 40px; }
 }
 
-@media (max-width: 360px) { /* Ultra-small (old phones) */
-    .app-grid { grid-template-columns: repeat(2, 1fr); } /* 2 cols */
-}
-
-@media (orientation: landscape) { /* Landscape mode */
+@media (max-width: 393px) { /* iPhone 15/14 */
     .app-grid {
-        grid-template-columns: repeat(5, 1fr); /* More cols sideways */
-        gap: 12px;
-        padding: 40px 8px 16px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        padding: 48px 6px 14px;
     }
-    .status-bar { height: 30px; font-size: 12px; }
+    .status-bar { height: 40px; padding: 0 12px; }
+}
+
+@media (max-width: 360px) { /* Galaxy S/small Androids */
+    .app-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 600px) and (max-width: 800px) { /* Foldables portrait */
+    .app-grid { grid-template-columns: repeat(5, 1fr); gap: 18px; }
+}
+
+@media (orientation: landscape) and (max-height: 500px) { /* Landscape phones */
+    .app-grid {
+        grid-template-columns: repeat(6, 1fr);
+        gap: 10px;
+        padding: 30px 6px 10px;
+    }
+    .status-bar { height: 28px; font-size: 12px; }
 }
