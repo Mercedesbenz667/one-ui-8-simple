@@ -1,20 +1,26 @@
-// One UI 8 Enhanced: TikTok Animations + Weather
+// One UI 8: Theme + Wallpaper + Premium Anims
 document.addEventListener('DOMContentLoaded', () => {
     const homeScreen = document.getElementById('home-screen');
     const appScreens = document.querySelectorAll('.app-screen');
     const appIcons = document.querySelectorAll('.app-icon');
     const root = document.documentElement;
+    const wallpaperOptions = document.querySelectorAll('.wallpaper-option');
 
-    // Load saved settings
+    // Load saved
+    const savedTheme = localStorage.getItem('theme') || 'light';
     const savedSpeed = localStorage.getItem('anim-speed') || 1;
     const savedEasing = localStorage.getItem('anim-easing') || 'elastic';
     const savedOneUI8 = localStorage.getItem('oneui8-mode') !== 'false';
+    const savedWallpaper = localStorage.getItem('wallpaper') || 'default';
     root.style.setProperty('--anim-speed', savedSpeed);
     updateEasing(savedEasing);
+    document.body.classList.toggle('dark-theme', savedTheme === 'dark');
+    document.body.classList.toggle('oneui8-quick', savedOneUI8);
+    document.getElementById('theme-toggle').checked = savedTheme === 'dark';
     document.getElementById('oneui8-mode').checked = savedOneUI8;
-    if (savedOneUI8) document.body.classList.add('oneui8-quick');
+    applyWallpaper(savedWallpaper);
 
-    // Open app (smooth, like video)
+    // Open app
     appIcons.forEach(icon => {
         icon.addEventListener('click', () => {
             const appId = icon.dataset.app;
@@ -24,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Close app (bouncy close)
+    // Close app (add stagger class for icons)
     document.querySelectorAll('.back-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const appId = btn.dataset.close;
@@ -32,7 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
             targetApp.classList.add('closing');
             setTimeout(() => {
                 targetApp.classList.remove('active', 'closing');
-                homeScreen.classList.add('active');
+                homeScreen.classList.add('active', 'home-return'); // Trigger stagger
+                setTimeout(() => homeScreen.classList.remove('home-return'), 600); // Clear after anim
             }, (parseFloat(getComputedStyle(root).getPropertyValue('--anim-duration-close')) / parseFloat(getComputedStyle(root).getPropertyValue('--anim-speed'))) * 1000 + 50);
         });
     });
@@ -55,35 +62,57 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Tuning
+    // Theme Toggle
+    document.getElementById('theme-toggle').addEventListener('change', (e) => {
+        document.body.classList.toggle('dark-theme', e.target.checked);
+        localStorage.setItem('theme', e.target.checked ? 'dark' : 'light');
+    });
+
+    // Wallpaper Changer (in Gallery)
+    wallpaperOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            const wp = option.dataset.wallpaper;
+            applyWallpaper(wp);
+            localStorage.setItem('wallpaper', wp);
+            // Smooth fade to home
+            const currentApp = document.querySelector('.app-screen.active');
+            currentApp.classList.add('closing');
+            setTimeout(() => {
+                currentApp.classList.remove('active', 'closing');
+                homeScreen.classList.add('active');
+            }, 300);
+        });
+    });
+
+    function applyWallpaper(wp) {
+        const styles = {
+            'default': 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+            'sunset': 'linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%)',
+            'ocean': 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+            'night': 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        };
+        document.body.style.background = styles[wp] || styles['default'];
+        document.body.style.transition = 'background 0.8s ease'; // Smooth change
+    }
+
+    // Other Tuning (Speed, Easing, One UI 8 Mode)
     const speedSelect = document.getElementById('anim-speed');
     const easingSelect = document.getElementById('anim-easing');
     const oneui8Toggle = document.getElementById('oneui8-mode');
     const quickDemo = document.getElementById('quick-demo');
 
     speedSelect.value = savedSpeed;
-    speedSelect.addEventListener('change', (e) => {
-        root.style.setProperty('--anim-speed', e.target.value);
-        localStorage.setItem('anim-speed', e.target.value);
-    });
+    speedSelect.addEventListener('change', (e) => { root.style.setProperty('--anim-speed', e.target.value); localStorage.setItem('anim-speed', e.target.value); });
 
     easingSelect.value = savedEasing;
-    easingSelect.addEventListener('change', (e) => {
-        updateEasing(e.target.value);
-        localStorage.setItem('anim-easing', e.target.value);
-    });
+    easingSelect.addEventListener('change', (e) => { updateEasing(e.target.value); localStorage.setItem('anim-easing', e.target.value); });
 
     oneui8Toggle.addEventListener('change', (e) => {
-        if (e.target.checked) {
-            document.body.classList.add('oneui8-quick');
-            localStorage.setItem('oneui8-mode', 'true');
-        } else {
-            document.body.classList.remove('oneui8-quick');
-            localStorage.setItem('oneui8-mode', 'false');
-        }
+        document.body.classList.toggle('oneui8-quick', e.target.checked);
+        localStorage.setItem('oneui8-mode', e.target.checked);
     });
 
-    // Quick Switch Demo (Rapid open/close like TikTok video)
+    // Quick Demo (Staggered switches)
     quickDemo.addEventListener('click', () => {
         const apps = ['camera', 'gallery', 'music'];
         let i = 0;
@@ -97,35 +126,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 homeScreen.classList.remove('active');
                 nextApp.classList.add('active');
                 i++;
-                if (i >= 6) { // 6 quick switches
+                if (i >= 5) {
                     clearInterval(interval);
                     setTimeout(() => {
                         nextApp.classList.add('closing');
                         setTimeout(() => {
                             nextApp.classList.remove('active', 'closing');
-                            homeScreen.classList.add('active');
-                        }, 250);
-                    }, 500);
+                            homeScreen.classList.add('active', 'home-return');
+                            setTimeout(() => homeScreen.classList.remove('home-return'), 600);
+                        }, 200);
+                    }, 400);
                 }
-            }, 250);
-        }, 300); // ~0.3s per switch for smoothness
+            }, 200);
+        }, 250);
     });
 
     function updateEasing(style) {
-        let openEasing, closeEasing;
-        switch (style) {
-            case 'standard': openEasing = 'cubic-bezier(0.25, 0.1, 0.25, 1)'; closeEasing = 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'; break;
-            case 'elastic': openEasing = 'cubic-bezier(0.4, 0, 0.2, 1)'; closeEasing = 'cubic-bezier(0.34, 1.56, 0.64, 1)'; break;
-            case 'custom': openEasing = 'cubic-bezier(0.68, -0.55, 0.265, 1.55)'; closeEasing = 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'; break;
-        }
-        root.style.setProperty('--anim-easing-open', openEasing);
-        root.style.setProperty('--anim-easing-close', closeEasing);
+        const easings = {
+            standard: { open: 'cubic-bezier(0.25, 0.1, 0.25, 1)', close: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)' },
+            elastic: { open: 'cubic-bezier(0.4, 0, 1, 1)', close: 'cubic-bezier(0.25, 0.46, 0.45, 1.2)' },
+            custom: { open: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)', close: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)' }
+        };
+        const easing = easings[style];
+        root.style.setProperty('--anim-easing-open', easing.open);
+        root.style.setProperty('--anim-easing-close', easing.close);
     }
 
     // Orientation
-    function handleOrientation() {
-        document.body.classList.toggle('landscape', window.innerWidth > window.innerHeight);
-    }
+    function handleOrientation() { document.body.classList.toggle('landscape', window.innerWidth > window.innerHeight); }
     window.addEventListener('resize', handleOrientation);
     handleOrientation();
 });
